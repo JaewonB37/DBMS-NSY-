@@ -1,0 +1,49 @@
+import mysql.connector
+
+def connect_to_database():
+    connection = mysql.connector.connect(
+        host='172.30.70.81',
+        user='jaewon',
+        password='1234',
+        database='madang',
+        port='4567'
+    )
+    return connection
+
+
+def execute_query(query):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+
+    results = None
+    try:
+        cursor.execute(query)
+        if query.strip().lower().startswith("select"):
+            results = cursor.fetchall()
+        else:
+            connection.commit()
+    except mysql.connector.Error as err:
+        print(f"에러: {err}")
+        return None
+    finally:
+        cursor.close()
+        connection.close()
+
+    return results
+
+
+if __name__ == "__main__":
+    while True:
+        query = input("SQL 쿼리를 입력하세요 (종료하려면 0을 입력): ")
+
+        if query == "0":
+            print("프로그램을 종료합니다.")
+            break
+
+        results = execute_query(query)
+
+        if results:
+            for row in results:
+                print(row)
+        else:
+            print("쿼리가 성공적으로 실행되었습니다.")
